@@ -10,8 +10,7 @@ require_once './vendor/autoload.php';
 
 use FormGuide\Handlx\FormHandler;
 
-
-$pp = new FormHandler();
+$pp = new FormHandler(true);
 
 $validator = $pp->getValidator();
 $validator->fields(['Name','Email','Phonenumber'])->areRequired()->maxLength(50);
@@ -25,8 +24,24 @@ $validator->field('AgeDo')->maxLength(2);
 $validator->field('M-FDog');
 $validator->field('Via');
 $validator = $pp->getValidator();
-$pp->sendEmailTo('pascal@magicolr.com'); // ← Your email here
-
+// $pp->sendEmailTo('pascal@magicolr.com'); // ← Your email here
 /*$pp->sendEmailTo('info@hondenschoolindy.nl'); // ← Your email here*/
 
-echo $pp->process($_POST);
+try {
+    //Recipients
+    $pp->setFrom('from@example.com', 'Mailer');
+    $pp->addAddress('pascal@magicolr.com'); // ← Receiving email here
+
+    //Content
+    $pp->isHTML(true);
+    $pp->Subject = "$field('NameDog') wil graag op puppy cursus!";
+    $pp->Body    = "De naam is $field('Email'). En het emailadres";
+    $pp->AltBody = 'Dit is de tekst voor email clients zonder HTML support';
+
+    $pp->send();
+    echo 'Je bericht is verstuurd!';
+} catch (Exception $e) {
+    echo "De email kon niet worden verzonden: {$mail->ErrorInfo}";
+}
+// echo $pp->process($_POST);
+?>
